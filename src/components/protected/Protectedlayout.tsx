@@ -1,18 +1,18 @@
-import { useAppContext } from "@/lib/context";
+import { AppProvider, useAppContext } from "@/lib/context";
 import authenticateUser from "@/services/authenticate";
 import { useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
+import { Toaster } from "../ui/toaster";
 
 const Protectedlayout = () => {
     const navigate = useNavigate();
     const [login, setlogin] = useState(false);
-    const { setUser } = useAppContext();
     useEffect(() => {
         const authenticate = async () => {
             const user_details = await authenticateUser();
             console.log(user_details)
-            if (user_details?.data?.user?._id) {
-                setUser(user_details.data._id);
+            if (typeof(user_details?.data?.user?._id)==='string') {
+                
                 setlogin(true);
             }
         };
@@ -26,8 +26,11 @@ const Protectedlayout = () => {
     }
     if (login) {
         return (
-            <>
+            <>  
+                <AppProvider>
                 <Outlet />
+                <Toaster/>
+                </AppProvider>
             </>
         );
     }
