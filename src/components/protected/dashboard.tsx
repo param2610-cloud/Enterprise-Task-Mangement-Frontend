@@ -23,7 +23,8 @@ import {
 import { Input } from "../ui/input";
 import { Label } from "@radix-ui/react-label";
 import { useToast } from "../ui/use-toast";
-import { Card, CardTitle } from "../ui/card";
+import { Card, CardContent, CardTitle } from "../ui/card";
+import getUserDetails from "@/services/getUserDetails";
 
 const Dashboard: React.FC = () => {
     const { user, setUser } = useAppContext();
@@ -34,6 +35,7 @@ const Dashboard: React.FC = () => {
     const [RoomList, setRoomList] = useState<any>([]);
     const [DialogOpen, setDialogOpen] = useState<boolean>(false);
     const [refineroomData, setrefineRoomData] = useState<any>([]);
+    const [detilsFetched, setDetailsFetched] = useState<boolean>(false);
 
     const { toast } = useToast();
     useEffect(() => {
@@ -84,7 +86,29 @@ const Dashboard: React.FC = () => {
             }
         };
         fetchAllRoomDetails();
+        setDetailsFetched(true);
     }, [RoomList]);
+    
+    useEffect(() => {
+        const fetchManagerDetails = async () => {
+            if (detilsFetched) {
+                const fetchdata = await Promise.all(
+                    refineroomData.map(async (item: any) => {
+                        console.log(item);
+                        const Manager = await getUserDetails(item.details.manager[0]);
+                        console.log(Manager);
+                        
+                        // return { ...item, Manager: Manager?.data.data };
+                    })
+                );
+                setrefineRoomData(fetchdata);
+                setDetailsFetched(false);
+            }
+        };
+        fetchManagerDetails();
+    }, [detilsFetched]);
+    
+    
     const MakeRoom = async () => {
         setLoading(true);
         if (RoomName && user) {
@@ -219,7 +243,11 @@ const Dashboard: React.FC = () => {
                                     ? item.details.name
                                     : "Loading..."}
                             </CardTitle>
-                            {/* Display other details as needed */}
+                            <CardContent>
+                                <div>
+                                    {/* {item.details} */}
+                                </div>
+                            </CardContent>
                         </Card>
                     ))}
                 </div>
