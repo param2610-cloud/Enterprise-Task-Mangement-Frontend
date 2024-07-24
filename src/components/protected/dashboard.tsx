@@ -23,7 +23,7 @@ import {
 import { Input } from "../ui/input";
 import { Label } from "@radix-ui/react-label";
 import { useToast } from "../ui/use-toast";
-import { Card } from "../ui/card";
+import { Card, CardTitle } from "../ui/card";
 
 const Dashboard: React.FC = () => {
     const { user, setUser } = useAppContext();
@@ -32,27 +32,25 @@ const Dashboard: React.FC = () => {
     const [Loading, setLoading] = useState<boolean>(false);
     const [RoomName, setRoomName] = useState<string | null>();
     const [RoomList, setRoomList] = useState<any>([]);
-    const [DialogOpen,setDialogOpen] = useState<boolean>(false)
+    const [DialogOpen, setDialogOpen] = useState<boolean>(false);
+    const [refineroomData, setrefineRoomData] = useState<any>([]);
 
     const { toast } = useToast();
     useEffect(() => {
         const authenticate = async () => {
             const user_details = await authenticateUser();
-            console.log(user_details);
             if (typeof user_details?.data?.user?._id === "string") {
                 setUser(user_details?.data?.user?._id);
             }
         };
         authenticate();
     }, []);
-    const FetchAllRoomData = async () => {
-      if(user){
-        const roomData = await api.get("/rooms/employee-list", {
-
-            params: { userId: user }, 
-          });
-          setRoomList(roomData.data.data);
-          console.log("api response ",roomData);
+    const FetchAllRoomList = async () => {
+        if (user) {
+            const roomData = await api.get("/rooms/employee-list", {
+                params: { userId: user },
+            });
+            setRoomList(roomData.data.data);
         }
     };
     const fetchUserDetails = async (userId: String) => {
@@ -65,15 +63,37 @@ const Dashboard: React.FC = () => {
         }
         setUserDetails(UserDetails);
     };
+    const fetchRoomDetails = async (roomId: string) => {
+        const result = await api.get("/rooms/room-details", {
+            params: { roomId: roomId },
+        });
+        if (result) {
+            return result;
+        } else return null;
+    };
+    useEffect(() => {
+        const fetchAllRoomDetails = async () => {
+            if (RoomList) {
+                const fetchdata = await Promise.all(
+                    RoomList.map(async (item: any) => {
+                        const data = await fetchRoomDetails(item.roomid);
+                        return { ...item, details: data?.data.data };
+                    })
+                );
+                setrefineRoomData(fetchdata);
+            }
+        };
+        fetchAllRoomDetails();
+    }, [RoomList]);
     const MakeRoom = async () => {
         setLoading(true);
         if (RoomName && user) {
             const Roomdetails = await api.post("/rooms/make-room", {
                 user,
                 RoomName,
-              });
-              
-              setLoading(false);
+            });
+
+            setLoading(false);
             if (!Roomdetails) {
                 toast({
                     title: "Failed",
@@ -87,8 +107,7 @@ const Dashboard: React.FC = () => {
                 });
                 setDialogOpen(false);
             }
-            FetchAllRoomData();
-            
+            FetchAllRoomList();
         } else {
             if (!RoomName) {
                 toast({
@@ -99,9 +118,8 @@ const Dashboard: React.FC = () => {
         }
     };
     useEffect(() => {
-        console.log(user);
         if (user != null) {
-            FetchAllRoomData();
+            FetchAllRoomList();
             fetchUserDetails(user);
         }
     }, [user]);
@@ -112,9 +130,7 @@ const Dashboard: React.FC = () => {
         }
     }, [UserDetails]);
 
-    useEffect(()=>{
-      console.log("this is from use effect ",RoomList)
-    },[RoomList])
+    useEffect(() => {}, [RoomList]);
     return (
         <div className="box-order w-full  h-full overflow-hidden bg-[#ffffff] m-0 p-0">
             <div className="w-screen min-h-screen max-h-full flex flex-col">
@@ -124,9 +140,15 @@ const Dashboard: React.FC = () => {
                     </div>
                     <div className="flex gap-7">
                         <div id="CreateRoom">
-                            <Dialog open={DialogOpen} onOpenChange={setDialogOpen}>
+                            <Dialog
+                                open={DialogOpen}
+                                onOpenChange={setDialogOpen}
+                            >
                                 <DialogTrigger>
-                                    <button onClick={()=>setDialogOpen(e=>!e)} className="bg-red-500 px-4 py-2 rounded-md text-white font-bold">
+                                    <button
+                                        onClick={() => setDialogOpen((e) => !e)}
+                                        className="bg-red-500 px-4 py-2 rounded-md text-white font-bold"
+                                    >
                                         Create Room
                                     </button>
                                 </DialogTrigger>
@@ -159,7 +181,10 @@ const Dashboard: React.FC = () => {
                             </Dialog>
                         </div>
                         <div>
-                            <button onClick={FetchAllRoomData} className="bg-green-500 px-4 py-2 rounded-md text-white font-bold">
+                            <button
+                                onClick={FetchAllRoomList}
+                                className="bg-green-500 px-4 py-2 rounded-md text-white font-bold"
+                            >
                                 Join Room
                             </button>
                         </div>
@@ -186,12 +211,17 @@ const Dashboard: React.FC = () => {
                         </div>
                     </div>
                 </div>
-                <div className="w-screen h-full grid-flow-row mt-[7vh]">
-                  {RoomList && RoomList.map((item:any,index:any)=>(
-                    <Card id={index} className="">
-                      {JSON.stringify(item)}
-                    </Card>
-                  ))}
+                <div className="w-screen h-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4 mt-[7vh]">
+                    {refineroomData.map((item: any, index: any) => (
+                        <Card key={index} className="">
+                            <CardTitle>
+                                {item.details
+                                    ? item.details.name
+                                    : "Loading..."}
+                            </CardTitle>
+                            {/* Display other details as needed */}
+                        </Card>
+                    ))}
                 </div>
             </div>
         </div>
