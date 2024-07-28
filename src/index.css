@@ -17,3 +17,7 @@
     font-family: 'Poppins',sans-serif;
     src: url('./assets/Poppins-Regular.ttf') format('truetype');
   }
+@font-face {
+    font-family: 'PlayfairDisplay',sans-serif;
+    src: url('./assets/PlayfairDisplay-Medium.ttf') format('truetype');
+  }

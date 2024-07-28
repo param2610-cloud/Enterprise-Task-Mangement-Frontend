@@ -34,7 +34,8 @@ module.exports = {
       fontFamily:{
         Inter: ['Inter','sans-serif'],
         Lato: ['Lato','sans-serif'],
-        Poppins: ['Poppins','sans-serif']
+        Poppins: ['Poppins','sans-serif'],
+        PlayfairDisplay: ['PlayfairDisplay','sans-serif'],
       }
     },
   },

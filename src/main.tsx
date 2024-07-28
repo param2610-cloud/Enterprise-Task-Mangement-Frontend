@@ -10,6 +10,7 @@ import Layout from './layout.tsx'
 import Dashboard from './components/protected/dashboard.tsx'
 import { AppProvider } from './lib/context.tsx'
 import Protectedlayout from './components/protected/Protectedlayout.tsx'
+import Room from './components/protected/room.tsx'
 
 const router = createBrowserRouter([
   {
@@ -41,7 +42,12 @@ const router = createBrowserRouter([
           {
             path:"dashboard",
             element:<Dashboard/>
+          },
+          {
+            path:"room/:roomId",
+            element:<Room/>
           }
+          
         ]
       }
     ]
@@ -53,5 +59,5 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <AppProvider>
       <RouterProvider router={router}/>
     </AppProvider>
-  // </React.StrictMode>,
+  // </React.StrictMode>
 )

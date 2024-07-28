@@ -25,15 +25,17 @@ import { Label } from "@radix-ui/react-label";
 import { useToast } from "../ui/use-toast";
 import { Card, CardContent, CardTitle } from "../ui/card";
 import getUserDetails from "@/services/getUserDetails";
+import { Link } from "react-router-dom";
 
 const Dashboard: React.FC = () => {
-    const { user, setUser } = useAppContext();
+    const { user, setUser,setRoomDatabase } = useAppContext();
     const [UserDetails, setUserDetails] = useState<ApiResponse | any>();
     const [avatarImage, setAvatarImage] = useState<string>("");
     const [Loading, setLoading] = useState<boolean>(false);
     const [RoomName, setRoomName] = useState<string | null>();
-    const [RoomList, setRoomList] = useState<any>([]);
+    const [Array_Of_Employee_Details_On_Specific_Room, setArray_Of_Employee_Details_On_Specific_Room] = useState<any>([]);
     const [DialogOpen, setDialogOpen] = useState<boolean>(false);
+    const [refineroomDatawithoutmanager, setrefineRoomDatawithoutmanager] = useState<any>([]);
     const [refineroomData, setrefineRoomData] = useState<any>([]);
     const [detilsFetched, setDetailsFetched] = useState<boolean>(false);
 
@@ -47,25 +49,43 @@ const Dashboard: React.FC = () => {
         };
         authenticate();
     }, []);
-    const FetchAllRoomList = async () => {
+    
+    //now fetch details of all roomId exists at this state
+    //store the details of those in RoomList_Detail useState {Room_id,manager,name,isParent,Role}
+    
+    
+    
+    //Get all employee exists on this user id  
+    const Fetch_All_Employee_Exists_On_This_UserID = async () => {
         if (user) {
-            const roomData = await api.get("/rooms/employee-list", {
+            const employeeData = await api.get("/rooms/employee-list", {
                 params: { userId: user },
             });
-            setRoomList(roomData.data.data);
+            //store it in Array_Of_Employee_Details_On_Specific_Room useState
+            setArray_Of_Employee_Details_On_Specific_Room(employeeData.data.data);
         }
     };
+
     const fetchUserDetails = async (userId: String) => {
         const UserDetails = await api.get("/users/getUser", {
             params: { userId: userId },
         });
-
+        
         if (!UserDetails) {
             return null;
         }
         setUserDetails(UserDetails);
     };
-    const fetchRoomDetails = async (roomId: string) => {
+
+    //run it in useeffect[user]
+    useEffect(() => {
+        if (user != null) {
+            Fetch_All_Employee_Exists_On_This_UserID();
+            fetchUserDetails(user);
+        }
+    }, [user]);
+
+    const fetch_Specific_Room_Details = async (roomId: string) => {
         const result = await api.get("/rooms/room-details", {
             params: { roomId: roomId },
         });
@@ -75,40 +95,41 @@ const Dashboard: React.FC = () => {
     };
     useEffect(() => {
         const fetchAllRoomDetails = async () => {
-            if (RoomList) {
+            if (Array_Of_Employee_Details_On_Specific_Room) {
                 const fetchdata = await Promise.all(
-                    RoomList.map(async (item: any) => {
-                        const data = await fetchRoomDetails(item.roomid);
-                        return { ...item, details: data?.data.data };
+                    Array_Of_Employee_Details_On_Specific_Room.map(async (item: any) => {
+                        const data = await fetch_Specific_Room_Details(item.roomid);
+                        return { Employee_Details:item, Room_Details: data?.data.data };
                     })
                 );
-                setrefineRoomData(fetchdata);
+                setrefineRoomDatawithoutmanager(fetchdata);
             }
         };
+        
         fetchAllRoomDetails();
-        setDetailsFetched(true);
-    }, [RoomList]);
-    
-    useEffect(() => {
-        const fetchManagerDetails = async () => {
-            if (detilsFetched) {
+        
+    }, [Array_Of_Employee_Details_On_Specific_Room]);
+    useEffect(()=>{
+        const fetchManagerDetailsAndRole = async () => {
                 const fetchdata = await Promise.all(
-                    refineroomData.map(async (item: any) => {
-                        console.log(item);
-                        const Manager = await getUserDetails(item.details.manager[0]);
-                        console.log(Manager);
-                        
-                        // return { ...item, Manager: Manager?.data.data };
+                    refineroomDatawithoutmanager.map(async (item: any) => {
+                        const Manager = await getUserDetails(
+                            item.Room_Details.manager[0]
+                        );
+
+                        return { ...item, Manager_Details: Manager?.data.data };
                     })
                 );
                 setrefineRoomData(fetchdata);
-                setDetailsFetched(false);
-            }
+            
         };
-        fetchManagerDetails();
-    }, [detilsFetched]);
-    
-    
+        if(refineroomDatawithoutmanager.length > 0 && refineroomDatawithoutmanager[0]?.Room_Details){
+            fetchManagerDetailsAndRole();
+        }
+    },[refineroomDatawithoutmanager])
+
+
+
     const MakeRoom = async () => {
         setLoading(true);
         if (RoomName && user) {
@@ -131,7 +152,7 @@ const Dashboard: React.FC = () => {
                 });
                 setDialogOpen(false);
             }
-            FetchAllRoomList();
+            Fetch_All_Employee_Exists_On_This_UserID();
         } else {
             if (!RoomName) {
                 toast({
@@ -142,19 +163,13 @@ const Dashboard: React.FC = () => {
         }
     };
     useEffect(() => {
-        if (user != null) {
-            FetchAllRoomList();
-            fetchUserDetails(user);
-        }
-    }, [user]);
-    useEffect(() => {
         if (UserDetails) {
             if (typeof UserDetails.data.data.avatarUrl == "string")
                 setAvatarImage(UserDetails.data.data.avatarUrl);
         }
     }, [UserDetails]);
 
-    useEffect(() => {}, [RoomList]);
+    // useEffect(() => {}, [RoomList]);
     return (
         <div className="box-order w-full  h-full overflow-hidden bg-[#ffffff] m-0 p-0">
             <div className="w-screen min-h-screen max-h-full flex flex-col">
@@ -206,7 +221,7 @@ const Dashboard: React.FC = () => {
                         </div>
                         <div>
                             <button
-                                onClick={FetchAllRoomList}
+                                onClick={Fetch_All_Employee_Exists_On_This_UserID}
                                 className="bg-green-500 px-4 py-2 rounded-md text-white font-bold"
                             >
                                 Join Room
@@ -236,20 +251,24 @@ const Dashboard: React.FC = () => {
                     </div>
                 </div>
                 <div className="w-screen h-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4 mt-[7vh]">
-                    {refineroomData.map((item: any, index: any) => (
+                    {refineroomData.map((item: any, index: any) =>{
+                        console.log(item)
+                        
+                    return (
+                        <Link to={`/panel/room/${item.Room_Details._id}`} onClick={()=>{setRoomDatabase(item)}}>
                         <Card key={index} className="">
                             <CardTitle>
-                                {item.details
-                                    ? item.details.name
+                                {item.Room_Details
+                                    ? item.Room_Details.name
                                     : "Loading..."}
                             </CardTitle>
                             <CardContent>
-                                <div>
-                                    {/* {item.details} */}
-                                </div>
+                                <div>{item.Manager_Details.name}</div>
+                                <div>{item.Employee_Details.role}</div>
                             </CardContent>
                         </Card>
-                    ))}
+                    </Link>
+                    )})}
                 </div>
             </div>
         </div>
