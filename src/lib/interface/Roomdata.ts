@@ -12,6 +12,7 @@ export interface EmployeeDetails {
     __v: number;
 }
 
+
 export interface RoomDetails {
     _id: string;
     name: string;

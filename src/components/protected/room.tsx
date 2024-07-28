@@ -10,6 +10,7 @@ import {
     RoomData,
     RoomDetails,
 } from "@/lib/interface/Roomdata";
+import getUserDetails from "@/services/getUserDetails";
 
 const Room = () => {
     const { roomId } = useParams();
@@ -19,7 +20,6 @@ const Room = () => {
         const authenticate = async () => {
             const user_details = await authenticateUser();
             if (typeof user_details?.data?.user?._id === "string") {
-                console.log(user_details?.data?.user?._id);
                 setUser(user_details?.data?.user?._id);
             }
         };
@@ -63,13 +63,11 @@ const Room = () => {
                 const fetchManagerDetails = async (managerIds: string[]) => {
                     try {
                         const promises = managerIds.map((id) =>
-                            api.get("/users/getUser", {
-                                params: { userId: id },
-                            })
+                            getUserDetails(id)
                         );
                         const responses = await Promise.all(promises);
                         const managers = responses.map(
-                            (response) => response.data.data
+                            (response) => response?.data.data
                         );
                         return managers;
                     } catch (error) {
@@ -119,24 +117,21 @@ const Room = () => {
             }
         };
 
-        if (RoomDatabase == null) {
+        if (RoomDatabase == null && user != null) {
             fetchData();
         }
-    }, [
-        roomId,
-        user,
-        RoomDetails,
-        ManagerDetails,
-        employeeDetails,
-        RoomDatabase,
-        setUser,
-        setRoomDatabase,
-        toast,
-    ]);
+    }, [RoomDatabase, user, RoomDetails]);
 
-    console.log(employeeDetails);
-    console.log(ManagerDetails);
-    console.log(RoomDetails);
+    useEffect(() => {
+        if (employeeDetails && ManagerDetails && RoomDetails) {
+            setRoomDatabase({
+                Employee_Details: employeeDetails,
+                Manager_Details: ManagerDetails, 
+                Room_Details: RoomDetails,
+            });
+        }
+        console.log(RoomDatabase)
+    }, [employeeDetails, ManagerDetails, RoomDetails]);
 
     return (
         <div className="box-order w-full h-full overflow-hidden bg-[#ffffff] m-0 p-0">
