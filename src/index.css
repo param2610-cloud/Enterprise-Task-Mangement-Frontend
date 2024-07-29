@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 
 
 @font-face {
@@ -20,4 +21,8 @@
 @font-face {
     font-family: 'PlayfairDisplay',sans-serif;
     src: url('./assets/PlayfairDisplay-Medium.ttf') format('truetype');
+  }
+@font-face {
+    font-family: 'Montserrat',sans-serif;
+    src: url('./assets/Montserrat-ExtraBold.ttf') format('truetype');
   }

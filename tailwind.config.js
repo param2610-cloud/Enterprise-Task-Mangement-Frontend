@@ -36,6 +36,7 @@ module.exports = {
         Lato: ['Lato','sans-serif'],
         Poppins: ['Poppins','sans-serif'],
         PlayfairDisplay: ['PlayfairDisplay','sans-serif'],
+        Montserrat: ['Montserrat','sans-serif'],
       }
     },
   },
