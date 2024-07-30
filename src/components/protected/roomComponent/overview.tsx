@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
 import { useAppContext } from "@/lib/context";
 import { Edit, Trash2 } from "lucide-react";
 
@@ -10,24 +11,28 @@ function Overview() {
         <div className="w-screen h-full grid gap-4 grid-cols-10 grid-rows-10">
             <div
                 id="roomName"
-                className="row-start-1 row-end-3 col-start-1 col-end-3 flex justify-start items-center text-[40px] font-Montserrat font-extrabold  pl-10"
+                className="row-start-1 row-end-3 col-start-1 col-end-4 flex justify-start items-center text-[3vw] font-Montserrat font-extrabold  pl-10 flex-col"
             >
-                {RoomDatabase?.Room_Details.name}
+                <div className="w-full h-full">
+                <p>{RoomDatabase?.Room_Details.name}</p>
+                <p className="text-green-500 text-sm font-medium w-full pl-2">{RoomDatabase?.Employee_Details.role}</p>
+                </div>
             </div>
             <div
                 id="author"
-                className="row-start-1 row-end-5 col-start-1 col-end-3 flex justify-center items-center"
+                className="row-start-3 row-end-5 col-start-1 col-end-4 flex justify-center items-center"
             >
-                <div className="shadow-lg p-10 rounded-lg text-xl font-Lato flex">
-                    Author :{" "}
-                    <p className="text-blue-500 pl-1 hover:border-b-2 border-blue-500 cursor-pointer">
-                        {RoomDatabase?.Manager_Details[0].name}
+                <div className=" ml-2 shadow-lg  rounded-lg text-[2vw] font-Lato flex w-full h-full flex justify-center items-center flex-col">
+                    
+                    <p className="flex text-blue-500 pl-1 hover:border-b-2 border-blue-500 cursor-pointer">
+                    <p className="text-black">Author :{" "}</p>{RoomDatabase?.Manager_Details[0].name}
                     </p>
-                </div>
+                    
+                </div>  
             </div>
-            <div className="row-start-3 row-end-10 col-start-1 col-end-4 p-10">
-              <div className="mt-10 w-full h-full">
-              <div className="text-[30px] font-bold flex justify-between items-center">
+            <div className="row-start-5 row-end-10 col-start-1 col-end-4 pl-3">
+              <div className=" w-full h-full">
+              <div className="text-[30px] font-bold flex justify-between items-center pl-4">
                 Manager List
                 <Button>Add Manager</Button>
               </div>
@@ -35,8 +40,8 @@ function Overview() {
                     <ScrollArea className="h-full w-full">
                         {RoomDatabase?.Manager_Details.map((manager,index:number)=>{
                           return(
-                            <div id={index.toString()} className="text-[20px] px-6 py-4 border-2 m-2 rounded-md flex items-center font-bold justify-between">
-                              {manager.name}
+                            <div id={index.toString()} className="text-[20px] px-6 py-4  m-2 rounded-md flex items-center font-bold justify-between shadow-md">
+                              {index+1+'.'}{' '}{manager.name}
                               <div>
                               <Button className="bg-white hover:bg-white text-black active:scale-8  0 transition-transform duration-150 ease-in-out">
                                 <Edit size={15}/>
@@ -50,6 +55,24 @@ function Overview() {
                         })}
                     </ScrollArea>
                 </div>
+              </div>
+            </div>
+            <div className="col-start-4 col-end-10 row-start-1 row-end-11 border-2 m-4">
+              <div className="text-[2vw] font-bold pl-5 pt-2 pb-1">
+                Employees list
+              </div>
+              <Separator/>
+              <div className="h-full w-full">
+                <ScrollArea className="h-full w-full">
+                  {RoomDatabase?.Room_Details?.manager.map((item,index)=>{ 
+                    
+                    return (
+                      <div>
+                        {}
+                      </div>
+                    )
+                  })}
+                </ScrollArea>
               </div>
             </div>
         </div>
