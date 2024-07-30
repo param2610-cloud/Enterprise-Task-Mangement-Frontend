@@ -1,7 +1,7 @@
 import { useAppContext } from "@/lib/context";
 import api from "@/services/api";
 import authenticateUser from "@/services/authenticate";
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useToast } from "../ui/use-toast";
 import {
@@ -14,14 +14,17 @@ import { ResizableHandle,ResizablePanel,ResizablePanelGroup } from "../ui/resiza
 import { Box } from "lucide-react";
 import { Separator } from "../ui/separator";
 import { Button } from "../ui/button";
-import Overview from "./roomComponent/overview";
+// import Overview from "./roomComponent/overview";
 import Tasks from "./roomComponent/tasks";
 import Employee from "./roomComponent/employee";
 import Status from "./roomComponent/status";
 
 const Room = () => {
+    const Overview = lazy(() => new Promise(r => setTimeout(() => r(import('./roomComponent/overview.tsx')), 1000)));
+    console.log("adasd")
     const { roomId } = useParams();
     const { user, setUser, RoomDatabase, setRoomDatabase } = useAppContext();
+    console.log(RoomDatabase)
     const { toast } = useToast();
     const [Tab,setTab] = useState<number>(1);
     useEffect(() => {
@@ -187,7 +190,7 @@ const Room = () => {
                 <ResizableHandle withHandle/>
                 <ResizablePanel defaultSize={87}>
                 <div className=" w-full h-screen">
-                    {Tab===1? <Overview/>:<></>}
+                    {Tab===1? <Suspense fallback={'Loading'}><Overview/></Suspense>:<></>}
                     {Tab===2? <Tasks/>:<></>}
                     {Tab===3? <Employee/>:<></>}
                     {Tab===4? <Status/>:<></>}
