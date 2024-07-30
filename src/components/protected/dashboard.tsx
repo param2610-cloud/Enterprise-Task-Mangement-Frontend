@@ -15,9 +15,7 @@ import {
     Dialog,
     DialogContent,
     DialogDescription,
-    DialogFooter,
     DialogHeader,
-    DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "../ui/input";
@@ -31,13 +29,13 @@ const Dashboard: React.FC = () => {
     const { user, setUser,setRoomDatabase } = useAppContext();
     const [UserDetails, setUserDetails] = useState<ApiResponse | any>();
     const [avatarImage, setAvatarImage] = useState<string>("");
-    const [Loading, setLoading] = useState<boolean>(false);
+    const [, setLoading] = useState<boolean>(false);
     const [RoomName, setRoomName] = useState<string | null>();
     const [Array_Of_Employee_Details_On_Specific_Room, setArray_Of_Employee_Details_On_Specific_Room] = useState<any>([]);
     const [DialogOpen, setDialogOpen] = useState<boolean>(false);
     const [refineroomDatawithoutmanager, setrefineRoomDatawithoutmanager] = useState<any>([]);
     const [refineroomData, setrefineRoomData] = useState<any>([]);
-    const [detilsFetched, setDetailsFetched] = useState<boolean>(false);
+    // const [] = useState<boolean>(false);
 
     const { toast } = useToast();
     useEffect(() => {

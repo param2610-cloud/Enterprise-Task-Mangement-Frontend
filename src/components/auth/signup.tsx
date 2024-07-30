@@ -21,7 +21,7 @@ function Signup() {
     const [password, setPassword] = useState("");
     const [name, setName] = useState("");
     const [Confirmpassword, setConfirmPassword] = useState("");
-    const [selectedfile, setselecetedfile] = useState(null);
+    const [selectedfile] = useState(null);
     const [error, setError] = useState<ErrorMessage>();
     const [message, setMessage] = useState<Message>();
     const [same, setSame] = useState<boolean | null>(false);
@@ -205,8 +205,7 @@ function Signup() {
             <div className="flex  items-center justify-center w-1/2 bg-green-50 p-8">
                 <div className="flex flex-col items-center justify-center">
                     <Avataruploader
-                        selectedfile={selectedfile}
-                        setselecetedfile={setselecetedfile}
+                        setselecetedfile={selectedfile}
                     />
                 </div>
                 <div className="flex flex-col items-center justify-center w-1/2 bg-green-50 p-8">

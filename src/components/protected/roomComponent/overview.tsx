@@ -27,7 +27,7 @@ function Overview() {
             </div>
             <div className="row-start-3 row-end-10 col-start-1 col-end-4 p-10">
               <div className="mt-10 w-full h-full">
-              <div className="text-[30px] font-bold flex justify-between justify-center items-center">
+              <div className="text-[30px] font-bold flex justify-between items-center">
                 Manager List
                 <Button>Add Manager</Button>
               </div>

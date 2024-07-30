@@ -7,7 +7,6 @@ import { useToast } from "../ui/use-toast";
 import {
     EmployeeDetails,
     ManagerDetails,
-    RoomData,
     RoomDetails,
 } from "@/lib/interface/Roomdata";
 import getUserDetails from "@/services/getUserDetails";

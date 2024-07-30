@@ -1,6 +1,6 @@
 import { useRef, useState } from "react"
 
-const Avataruploader = ({selectedfile,setselecetedfile}:{selectedfile:any,setselecetedfile:any})=>{
+const Avataruploader = ({setselecetedfile}:{setselecetedfile:any})=>{
     const [previewUrl, setprevieUrl] = useState<any>(null);
     const uploadref = useRef<any>(null);
 
